@@ -1,0 +1,38 @@
+<html>
+    <head>
+        <title>Digi Chat</title>
+        <link rel="stylesheet" href="assets/css/styles.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    </head>
+    <body>
+
+        <div class="container">
+            <aside class="sidebar">
+            <h2>Digi Chat</h2>
+            <button onclick="clearChat()">+ New Chat</button>
+            </aside>
+
+            <main class="chat-area">
+
+            <div id="chat-box" class="chat-box">
+            </div>
+
+            <div id="file-preview" class="file-preview"></div>
+
+            <div class="prompt-bar">
+                <label for="file-input" class="file-icon" title="Attach a file">
+                    <i class="fas fa-paperclip"></i>
+                </label>
+
+                <input type="file" id="file-input" multiple hidden/>
+
+                <input id="user-input" type="text" placeholder="Type your message or prompt..."/>
+                <button onclick="sendMessage()">Send</button>
+            </div>
+            </main>
+        </div>
+
+        <script src="assets/js/response.js"></script>
+        <script src="assets/js/config.js"></script>
+    </body>
+</html>
