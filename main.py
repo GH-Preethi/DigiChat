@@ -77,17 +77,14 @@ def chat(data):
 
 # Function for File Processing
 def file_processing():
-    file = request.files.get('file')
+    uploaded_files = request.files.getlist('files[]')
     prompt = request.form.get('prompt', 'Describe this file.')
 
-    if not file:
+    if not uploaded_files or all(f.filename == '' for f in uploaded_files):
         return jsonify({'error': 'No file uploaded'}), 400
 
-    try:
-        response_text = process_file(file, prompt)
-        return jsonify({'response': response_text})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    response_text = process_file(uploaded_files, prompt)
+    return jsonify({'response': response_text})
 
 # Function for Web Search
 def search(data):

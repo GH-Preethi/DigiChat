@@ -50,20 +50,23 @@ async function sendMessage() {
 
     // Web Scraping
     if (wantsToScrape) {
-    const urlMatch = text.match(urlRegex);
-    const url = urlMatch[0];
-    const question = text.replace(urlRegex, '').trim();
-    data = await postCall('/llm', JSON.stringify({
+      const urlMatch = text.match(urlRegex);
+      const url = urlMatch?.[0];
+      const question = text.replace(urlRegex, '').trim();
+
+      if (!url) throw new Error("No valid URL found for scraping.");
+
+      data = await postCall('/llm', JSON.stringify({
         action: 'scrape_site',
         url,
         question,
         max_pages: 5
       }));
-    } 
+    }
     // Searching
     else if (wantsToSearch) {
       data = await postCall('/llm', JSON.stringify({ action: 'search', query: text }));
-    } 
+    }
     // Normal Chat
     else {
       data = await postCall('/llm', JSON.stringify({
@@ -73,12 +76,14 @@ async function sendMessage() {
       }));
     }
 
-      chatHistory[chatHistory.length - 1].content = data?.response || `Error: ${data?.error || 'No response'}`;
-    } catch (err) {
-      chatHistory[chatHistory.length - 1].content = "Request failed: " + err.message;
-    }
+    const responseText = data?.response || (data?.error ? `Error: ${data.error}` : 'No response from server');
+    chatHistory[chatHistory.length - 1].content = responseText;
 
-    renderChat();
+  } catch (err) {
+    chatHistory[chatHistory.length - 1].content = "Request failed: " + err.message;
+  }
+
+  renderChat();
 }
 
 // Send Files
@@ -96,7 +101,9 @@ async function sendFile(promptText) {
   const formData = new FormData();
   formData.append('prompt', prompt);
   formData.append('action', 'file_processing');
-  files.forEach(file => formData.append('file', file));
+
+  // ✅ Use 'files[]' as the key for all files
+  files.forEach(file => formData.append('files[]', file));
 
   try {
     const res = await fetch('/llm', { method: 'POST', body: formData });

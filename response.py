@@ -29,35 +29,43 @@ def chat_response(prompt, history=None):
     return response.text
 
 # File Handling
-def process_file(file_storage, prompt):
-    filename = file_storage.filename.lower()
+def process_file(file_storages, prompt):
+    responses = []
 
-    # Handler for Images
-    if filename.endswith(('.jpeg', '.jpg', '.png')):
-        image_bytes = file_storage.read()
-        image_part = content_types.Part.from_bytes(data=image_bytes, mime_type="image/jpeg")
+    for file_storage in file_storages:
+        filename = file_storage.filename.lower()
 
-        response = model_vision.generate_content(
-            [prompt, image_part]
-        )
-        return response.text
+        try:
+            # Handler for Images
+            if filename.endswith(('.jpeg', '.jpg', '.png')):
+                image_bytes = file_storage.read()
+                image_part = content_types.Part.from_bytes(data=image_bytes, mime_type="image/jpeg")
+                response = model_vision.generate_content([prompt, image_part])
+                responses.append(f"🖼️ {filename}:\n{response.text}")
 
-    # Handler for PDFs
-    elif filename.endswith('.pdf'):
-        reader = PdfReader(file_storage)
-        text = "".join([page.extract_text() or "" for page in reader.pages])
-        full_prompt = f"{prompt}\n\n{text}"
-        return generate_response(full_prompt)
+            # Handler for PDFs
+            elif filename.endswith('.pdf'):
+                reader = PdfReader(file_storage)
+                text = "".join([page.extract_text() or "" for page in reader.pages])
+                full_prompt = f"{prompt}\n\n{text}"
+                response_text = generate_response(full_prompt)
+                responses.append(f"📄 {filename}:\n{response_text}")
 
-    # Handler for Docx
-    elif filename.endswith('.docx'):
-        doc = docx.Document(file_storage)
-        text = "\n".join([para.text for para in doc.paragraphs])
-        full_prompt = f"{prompt}\n\n{text}"
-        return generate_response(full_prompt)
+            # Handler for DOCX
+            elif filename.endswith('.docx'):
+                doc = docx.Document(file_storage)
+                text = "\n".join([para.text for para in doc.paragraphs])
+                full_prompt = f"{prompt}\n\n{text}"
+                response_text = generate_response(full_prompt)
+                responses.append(f"📝 {filename}:\n{response_text}")
 
-    else:
-        raise ValueError("Unsupported file type. Use JPEG, PNG, PDF, or DOCX.")
+            else:
+                responses.append(f"⚠️ {filename}: Unsupported file type.")
+
+        except Exception as e:
+            responses.append(f"{filename}: Error processing file - {str(e)}")
+
+    return "\n\n".join(responses)
 
 # Web Search Functionality
 def web_search(query):
