@@ -5,38 +5,19 @@ body {
   color: white;
 }
 
+h1 {
+  text-align: center;
+}
+
+#header {
+  background-color: #1f1f2e;
+  color: white;
+}
+
 .container {
   display: flex;
   height: 100vh;
   overflow: hidden;
-}
-
-.sidebar {
-  width: 250px;
-  background-color: #1c1c1c;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-}
-
-.sidebar h2 {
-  color: #fff;
-  margin-bottom: 20px;
-}
-
-.sidebar button {
-  background-color: #10b981;
-  border: none;
-  padding: 12px;
-  color: white;
-  font-weight: bold;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.sidebar button:hover {
-  background-color: #059669;
 }
 
 .chat-area {
@@ -171,4 +152,3 @@ body {
   cursor: pointer;
   font-weight: bold;
 }
-

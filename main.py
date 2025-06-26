@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, send_file, send_from_directory
 from flask_cors import CORS
 from response import generate_response, chat_response, process_file, web_search, generate_rag_answer_from_site
+import traceback
 
 app = Flask(__name__)
 CORS(app)
@@ -22,27 +23,32 @@ def serve_assets(filename):
 # Combined Endpoint
 @app.route('/llm', methods=['POST'])
 def llm_router():
-    content_type = request.content_type or ""
+    try:
+        content_type = request.content_type or ""
 
-    if 'multipart/form-data' in content_type:
-        action = request.form.get('action')
-        if action == 'file_processing':
-            return file_processing()
-    else:
-        data = request.get_json()
-        action = data.get('action')
+        if 'multipart/form-data' in content_type:
+            action = request.form.get('action')
+            if action == 'file_processing':
+                return file_processing()
+        else:
+            data = request.get_json()
+            action = data.get('action')
 
-        if action == 'generate':
-            return generate(data)
-        elif action == 'chat':
-            return chat(data)
-        elif action == 'search':
-            return search(data)
-        elif action == 'scrape_site':
-            return scrape_site_route(data)
+            if action == 'generate':
+                return generate(data)
+            elif action == 'chat':
+                return chat(data)
+            elif action == 'search':
+                return search(data)
+            elif action == 'scrape_site':
+                return scrape_site_route(data)
 
-    return jsonify({'error': 'Invalid action or unsupported content type'}), 400  
+        return jsonify({'error': 'Invalid action or unsupported content type'}), 400  
 
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+    
 # Function for single prompting
 def generate(data):
     prompt = data.get('prompt')
@@ -113,4 +119,4 @@ def scrape_site_route(data):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, use_reloader=False)

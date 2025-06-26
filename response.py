@@ -129,6 +129,3 @@ def generate_rag_answer_from_site(url, question, max_pages=10):
 
     prompt = f"Use the following context from {url} to answer:\n\n{context}\n\nQ: {question}"
     return generate_response(prompt)
-
-
-
